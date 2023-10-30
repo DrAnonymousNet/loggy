@@ -14,14 +14,14 @@ var (
 )
 
 
-type index struct{
+type Index struct{
 	file *os.File
 	mmap gommap.MMap
 	size uint64
 }
 
-func newIndex(f *os.File, c Config)(*index, error){
-	idx := &index{
+func newIndex(f *os.File, c Config)(*Index, error){
+	idx := &Index{
 		file: f,
 	}
 	fi, err := os.Stat(f.Name())
@@ -43,7 +43,7 @@ func newIndex(f *os.File, c Config)(*index, error){
 	return idx, nil
 }
 
-func (i *index) Close() error {
+func (i *Index) Close() error {
 	if err := i.mmap.Sync(gommap.MS_SYNC); err != nil{
 		return err
 	}
@@ -58,7 +58,7 @@ func (i *index) Close() error {
 	return i.file.Close()
 }
 
-func (i *index)Read(in int64) (out uint32, pos uint64, err error){
+func (i *Index)Read(in int64) (out uint32, pos uint64, err error){
 	if i.size == 0 {
 		return 0, 0, io.EOF
 	}
@@ -77,7 +77,7 @@ func (i *index)Read(in int64) (out uint32, pos uint64, err error){
 
 }
 
-func (i *index)Write(off uint32, pos uint64) error{
+func (i *Index)Write(off uint32, pos uint64) error{
 	if uint64(len(i.mmap)) < i.size + entWidth{
 		return io.EOF
 	}
@@ -87,7 +87,7 @@ func (i *index)Write(off uint32, pos uint64) error{
 	return nil
 }
 
-func (i *index)Name() string {
+func (i *Index)Name() string {
 	return i.file.Name()
 }
 
